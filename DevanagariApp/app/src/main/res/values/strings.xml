@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Draw</string>
+    <string name="title">Devanagari</string>
+    <string name="Clear">Clear</string>
+    <string name="Next">Next</string>
+    <string name="start">Start</string>
+
+    <string name="result_popup_title">Result</string>
+    <string name="result_popup_correct">Your answer was correct!</string>
+    <string name="result_popup_incorrect">Your answer was incorrect!</string>
+    <string name="result_popup_override">Override</string>
+    <string name="result_popup_ok">Ok</string>
+
+    <string-array name="session_length">
+        <item>"20"</item>
+        <item>"40"</item>
+        <item>"60"</item>
+    </string-array>
+</resources>
