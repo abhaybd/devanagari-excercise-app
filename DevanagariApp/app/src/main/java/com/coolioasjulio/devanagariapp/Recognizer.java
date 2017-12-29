@@ -6,11 +6,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 
-import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
-import org.deeplearning4j.util.ModelSerializer;
+//import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
+//import org.deeplearning4j.util.ModelSerializer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,10 +19,11 @@ import java.io.InputStream;
 
 public class Recognizer {
     private static final String MODEL_PATH = "model.zip";
+    private static final String TAG = "Recognizer";
 
     private boolean ready = false;
     private ProgressBar progressBar;
-    private MultiLayerNetwork network;
+    //private MultiLayerNetwork network;
     public Recognizer(Context context, ProgressBar progressBar){
         this.progressBar = progressBar;
         initAsync(context);
@@ -39,7 +41,7 @@ public class Recognizer {
         progressBar.setVisibility(View.VISIBLE);
         LoadModelTask loadModelTask = new LoadModelTask();
         loadModelTask.context = context;
-        loadModelTask.doInBackground(MODEL_PATH);
+        loadModelTask.execute(MODEL_PATH);
     }
 
     private void showError(final Context context){
@@ -63,8 +65,11 @@ public class Recognizer {
     }
 
     private void loadModel(Context context, String path) throws IOException {
+        Log.d(TAG, "Loading model...");
         InputStream is = context.getAssets().open(path);
-        network = ModelSerializer.restoreMultiLayerNetwork(is);
+        //network = ModelSerializer.restoreMultiLayerNetwork(is);
+        is.close();
+        Log.d(TAG, "Model loaded!");
     }
 
     private class LoadModelTask extends AsyncTask<String,Void,Boolean>{
@@ -82,7 +87,9 @@ public class Recognizer {
             }
         }
 
+        @Override
         protected void onPostExecute(Boolean result){
+            Log.d(TAG,"AsyncTask finished!");
             ready = result;
             if(ready){
                 progressBar.setVisibility(View.GONE);

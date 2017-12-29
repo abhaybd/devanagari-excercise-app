@@ -9,6 +9,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -19,6 +20,7 @@ android {
 }
 
 dependencies {
+    implementation 'com.android.support:multidex:1.0.2'
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:26.1.0'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
@@ -28,8 +30,10 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 
+    /*
     annotationProcessor 'org.deeplearning4j:deeplearning4j-core:0.9.1'
     implementation 'org.deeplearning4j:deeplearning4j-core:0.9.1'
     implementation 'org.nd4j:nd4j-native:0.9.1'
     implementation group: 'org.nd4j', name: 'nd4j-native-platform', version: '0.9.1'
+    */
 }
