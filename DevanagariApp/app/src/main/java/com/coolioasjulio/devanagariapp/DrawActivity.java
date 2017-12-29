@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 
 public class DrawActivity extends AppCompatActivity implements View.OnClickListener{
     private static final String TAG = "DrawActivity";
@@ -30,7 +31,8 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
         numQuestions = intent.getIntExtra(MainActivity.SESSION_LENGTH_KEY, 60);
         sessionGenerator = new SessionGenerator(NUM_CHARS,numQuestions);
 
-        recognizer = new Recognizer();
+        ProgressBar spinner = findViewById(R.id.model_loading_spinner);
+        recognizer = new Recognizer(this, spinner);
 
         drawingView = findViewById(R.id.scratch_pad);
         drawingView.initializePen();
@@ -84,6 +86,7 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
                 drawingView.clear();
                 break;
             case R.id.next_button:
+                if(!recognizer.isReady()) break;
                 Bitmap bitmap = drawingView.getBitmap();
                 int bitmapWidth = bitmap.getWidth();
                 int bitmapHeight = bitmap.getHeight();

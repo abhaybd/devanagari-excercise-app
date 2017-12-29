@@ -11,6 +11,9 @@
     <string name="result_popup_override">Override</string>
     <string name="result_popup_ok">Ok</string>
 
+    <string name="model_import_error_title">Error</string>
+    <string name="model_import_error">There was an error loading the model!</string>
+
     <string-array name="session_length">
         <item>"20"</item>
         <item>"40"</item>
