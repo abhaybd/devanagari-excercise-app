@@ -10,8 +10,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 
-//import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
-//import org.deeplearning4j.util.ModelSerializer;
+import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
+import org.deeplearning4j.util.ModelSerializer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,16 +23,25 @@ public class Recognizer {
 
     private boolean ready = false;
     private ProgressBar progressBar;
-    //private MultiLayerNetwork network;
+    private MultiLayerNetwork network;
     public Recognizer(Context context, ProgressBar progressBar){
         this.progressBar = progressBar;
         initAsync(context);
     }
 
+    /**
+     * Is the neural network fully loaded?
+     * @return Whether the network is ready for inference.
+     */
     public boolean isReady(){
         return ready;
     }
 
+    /**
+     * Perform inference with data from the supplied bitmap.
+     * @param bitmap Bitmap to feed into the neural net.
+     * @return Predicted devanagari character index.
+     */
     public int getPrediction(Bitmap bitmap){
         return -1;
     }
@@ -67,7 +76,7 @@ public class Recognizer {
     private void loadModel(Context context, String path) throws IOException {
         Log.d(TAG, "Loading model...");
         InputStream is = context.getAssets().open(path);
-        //network = ModelSerializer.restoreMultiLayerNetwork(is);
+        network = ModelSerializer.restoreMultiLayerNetwork(is);
         is.close();
         Log.d(TAG, "Model loaded!");
     }
