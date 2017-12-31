@@ -57,6 +57,30 @@ public class DrawingView extends View {
         invalidate();
     }
 
+    public void disableDrawing(){
+        drawingEnabled = false;
+        mPaint.setAlpha(0);
+    }
+
+    public void enableDrawing(){
+        drawingEnabled = true;
+        mPaint.setAlpha(255);
+    }
+
+    public void setDrawingEnabled(boolean enabled){
+        if(enabled) enableDrawing();
+        else disableDrawing();
+    }
+
+    private boolean drawingEnabled;
+    public void toggleDrawingEnabled(){
+        setDrawingEnabled(!drawingEnabled);
+    }
+
+    public boolean isDrawingEnabled(){
+        return drawingEnabled;
+    }
+
     private void init() {
         mPath = new Path();
         mBitmapPaint = new Paint(Paint.DITHER_FLAG);

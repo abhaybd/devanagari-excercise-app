@@ -22,10 +22,10 @@ public class Recognizer {
     private static final String TAG = "Recognizer";
 
     private boolean ready = false;
-    private ProgressBar progressBar;
+    private Runnable onReadyCallback;
     private MultiLayerNetwork network;
-    public Recognizer(Context context, ProgressBar progressBar){
-        this.progressBar = progressBar;
+    public Recognizer(Context context, Runnable onReadyCallback){
+        this.onReadyCallback = onReadyCallback;
         initAsync(context);
     }
 
@@ -47,7 +47,6 @@ public class Recognizer {
     }
 
     private void initAsync(Context context){
-        progressBar.setVisibility(View.VISIBLE);
         LoadModelTask loadModelTask = new LoadModelTask();
         loadModelTask.context = context;
         loadModelTask.execute(MODEL_PATH);
@@ -101,7 +100,7 @@ public class Recognizer {
             Log.d(TAG,"AsyncTask finished!");
             ready = result;
             if(ready){
-                progressBar.setVisibility(View.GONE);
+                onReadyCallback.run();
             } else{
                 showError(context);
             }
