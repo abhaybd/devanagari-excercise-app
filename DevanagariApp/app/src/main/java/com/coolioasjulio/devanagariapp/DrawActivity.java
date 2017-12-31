@@ -22,6 +22,7 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
     private DrawingView drawingView;
     private SessionGenerator sessionGenerator;
     private Recognizer recognizer;
+    private Button clearButton, nextButton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,19 +32,33 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
         numQuestions = intent.getIntExtra(MainActivity.SESSION_LENGTH_KEY, 60);
         sessionGenerator = new SessionGenerator(NUM_CHARS,numQuestions);
 
-        ProgressBar spinner = findViewById(R.id.model_loading_spinner);
-        recognizer = new Recognizer(this, spinner);
-
         drawingView = findViewById(R.id.scratch_pad);
         drawingView.initializePen();
         drawingView.setPenSize(55f);
         drawingView.setPenColor(Color.BLACK);
 
-        Button clear = findViewById(R.id.clear_button);
-        clear.setOnClickListener(this);
+        clearButton = findViewById(R.id.clear_button);
+        clearButton.setClickable(false);
+        clearButton.setOnClickListener(this);
 
-        Button next = findViewById(R.id.next_button);
-        next.setOnClickListener(this);
+        nextButton = findViewById(R.id.next_button);
+        nextButton.setClickable(false);
+        nextButton.setOnClickListener(this);
+
+        final ProgressBar spinner = findViewById(R.id.model_loading_spinner);
+        spinner.setVisibility(View.VISIBLE);
+        drawingView.setDrawingEnabled(false);
+        Runnable onReadyCallback = new Runnable() {
+            @Override
+            public void run() {
+                spinner.setVisibility(View.GONE);
+                clearButton.setClickable(true);
+                nextButton.setClickable(true);
+                drawingView.setDrawingEnabled(true);
+                drawingView.clear();
+            }
+        };
+        recognizer = new Recognizer(this, onReadyCallback);
     }
 
     private void nextQuestion(boolean lastCorrect){
@@ -51,7 +66,10 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
         toGuess = sessionGenerator.next(lastCorrect);
         drawingView.clear();
         if(elapsedQuestions == numQuestions){
-            Log.d(TAG,"Session finished!");
+            double accuracy = (double)numCorrect/(double)numQuestions;
+            Log.d(TAG,String.format("Session finished with accuracy: %.2f", accuracy));
+            nextButton.setClickable(false);
+            clearButton.setClickable(false);
         }
     }
 
@@ -86,7 +104,6 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
                 drawingView.clear();
                 break;
             case R.id.next_button:
-                if(!recognizer.isReady()) break;
                 Bitmap bitmap = drawingView.getBitmap();
                 int bitmapWidth = bitmap.getWidth();
                 int bitmapHeight = bitmap.getHeight();
