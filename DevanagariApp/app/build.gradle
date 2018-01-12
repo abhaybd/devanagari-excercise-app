@@ -1,4 +1,4 @@
-apply plugin: 'com.android.application'
+apply plugin: "com.android.application"
 
 android {
     compileSdkVersion 26
@@ -14,7 +14,7 @@ android {
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
     packagingOptions {
@@ -27,39 +27,47 @@ android {
         exclude 'META-INF/NOTICE.txt'
         exclude 'META-INF/notice.txt'
         exclude 'META-INF/INDEX.LIST'
-        exclude 'edu/umd/cs/findbugs/annotations/CheckForNull.class'
         exclude 'org/bytedeco/javacpp/windows-x86/msvcp120.dll'
         exclude 'org/bytedeco/javacpp/windows-x86_64/msvcp120.dll'
         exclude 'org/bytedeco/javacpp/windows-x86/msvcr120.dll'
         exclude 'org/bytedeco/javacpp/windows-x86_64/msvcr120.dll'
     }
-    dexOptions {
-        jumboMode = true
+
+    configurations {
+        all*.exclude group: 'com.github.stephenc.findbugs', module: 'findbugs-annotations'
+        all*.exclude group: 'net.jcip', module: 'jcip-annotations'
+        all*.exclude group: 'com.google.code.findbugs', module: 'jsr305'
+    }
+
+    dexOptions{
+        jumboMode true
     }
 }
 
+ext {
+    dl4jVersion = "0.9.1"
+}
+
 dependencies {
-    implementation 'com.android.support:multidex:1.0.2'
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:26.1.0'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     implementation 'junit:junit:4.12'
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 
-    annotationProcessor 'org.deeplearning4j:deeplearning4j-core:0.9.1'
-    implementation ('org.deeplearning4j:deeplearning4j-core:0.9.1'){
-        exclude module: 'annotations'
-        exclude group: 'com.coogle.code.findbugs'
+    annotationProcessor 'org.projectlombok:lombok:1.16.16'
+    implementation 'com.google.code.findbugs:annotations:3.0.1', {
+        exclude module: 'jsr305'
+        exclude module: 'jcip-annotations'
     }
-    //annotationProcessor 'org.nd4j:nd4j-native:0.9.1'
-    implementation 'org.nd4j:nd4j-native:0.9.1'
-    implementation 'org.nd4j:nd4j-native:0.9.1:android-x86'
-    implementation 'org.nd4j:nd4j-native:0.9.1:android-arm'
-    implementation 'org.bytedeco.javacpp-presets:openblas:0.2.19-1.3:android-x86'
-    implementation 'org.bytedeco.javacpp-presets:openblas:0.2.19-1.3:android-arm'
-    //annotationProcessor group: 'org.nd4j', name: 'nd4j-native-platform', version: '0.9.1'
-    //implementation group: 'org.nd4j', name: 'nd4j-native-platform', version: '0.9.1'
+
+    implementation "org.deeplearning4j:deeplearning4j-core:${dl4jVersion}"
+    implementation "org.deeplearning4j:deeplearning4j-modelimport:${dl4jVersion}"
+    implementation "org.nd4j:nd4j-native:${dl4jVersion}"
+    implementation "org.nd4j:nd4j-native:${dl4jVersion}:android-x86"
+    implementation "org.nd4j:nd4j-native:${dl4jVersion}:android-arm"
+    implementation 'org.bytedeco.javacpp-presets:openblas:0.2.20-1.3:android-x86'
+    implementation 'org.bytedeco.javacpp-presets:openblas:0.2.20-1.3:android-arm'
 }
