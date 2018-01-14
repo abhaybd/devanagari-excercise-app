@@ -14,6 +14,7 @@ android {
     buildTypes {
         release {
             minifyEnabled false
+            useProguard false
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
@@ -65,6 +66,7 @@ dependencies {
 
     implementation "org.deeplearning4j:deeplearning4j-core:${dl4jVersion}"
     implementation "org.deeplearning4j:deeplearning4j-modelimport:${dl4jVersion}"
+    implementation "ch.qos.logback:logback-classic:1.2.3"
     implementation "org.nd4j:nd4j-native:${dl4jVersion}"
     implementation "org.nd4j:nd4j-native:${dl4jVersion}:android-x86"
     implementation "org.nd4j:nd4j-native:${dl4jVersion}:android-arm"
