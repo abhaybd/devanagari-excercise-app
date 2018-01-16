@@ -43,7 +43,7 @@ public class DrawingView extends View {
     }
 
     public Bitmap getBitmap(){
-        return mBitmap.copy(Bitmap.Config.ARGB_8888, true);
+        return mBitmap;
     }
 
     public void clear(){

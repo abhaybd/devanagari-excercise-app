@@ -12,6 +12,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 
+import static com.coolioasjulio.devanagariapp.ImageUtils.PredictImageTask.PredictionCallback;
+
 public class DrawActivity extends AppCompatActivity implements View.OnClickListener{
     private static final String TAG = "DrawActivity";
     private static final int NUM_CHARS = 36;
@@ -23,6 +25,7 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
     private SessionGenerator sessionGenerator;
     private Recognizer recognizer;
     private Button clearButton, nextButton;
+    private ProgressBar progressBar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,27 +41,49 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
         drawingView.setPenColor(Color.BLACK);
 
         clearButton = findViewById(R.id.clear_button);
-        clearButton.setClickable(false);
         clearButton.setOnClickListener(this);
 
         nextButton = findViewById(R.id.next_button);
-        nextButton.setClickable(false);
         nextButton.setOnClickListener(this);
 
-        final ProgressBar spinner = findViewById(R.id.model_loading_spinner);
-        spinner.setVisibility(View.VISIBLE);
-        drawingView.setDrawingEnabled(false);
+        progressBar = findViewById(R.id.model_loading_spinner);
+        disableUI();
         Runnable onReadyCallback = new Runnable() {
             @Override
             public void run() {
-                spinner.setVisibility(View.GONE);
-                clearButton.setClickable(true);
-                nextButton.setClickable(true);
-                drawingView.setDrawingEnabled(true);
-                drawingView.clear();
+                enableUI();
             }
         };
         recognizer = new Recognizer(this, onReadyCallback);
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch(view.getId()){
+            case R.id.clear_button:
+                drawingView.clear();
+                break;
+            case R.id.next_button:
+                disableUI();
+                Bitmap bitmap = drawingView.getBitmap();
+                PredictionCallback callback = new PredictionCallback() {
+                    @Override
+                    public void onFinished(int output) {
+                        boolean correct = (output == toGuess);
+                        String message = getResources().getString(R.string.result_popup_correct);
+                        if(!correct) message = getResources().getString(R.string.result_popup_incorrect);
+                        notifyUser(message, correct);
+
+                        numCorrect += correct?1:0;
+                        nextQuestion(correct);
+                        enableUI();
+                    }
+                };
+                recognizer.getPrediction(bitmap, callback);
+                break;
+            default:
+                break;
+        }
     }
 
     private void nextQuestion(boolean lastCorrect){
@@ -73,9 +98,24 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    private void disableUI(){
+        progressBar.setVisibility(View.VISIBLE);
+        clearButton.setClickable(false);
+        nextButton.setClickable(false);
+        drawingView.setDrawingEnabled(false);
+    }
+
+    private void enableUI(){
+        progressBar.setVisibility(View.GONE);
+        clearButton.setClickable(true);
+        nextButton.setClickable(true);
+        drawingView.setDrawingEnabled(true);
+        drawingView.clear();
+    }
+
     private void notifyUser(String message, boolean correct){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setCancelable(true);
+        builder.setCancelable(false);
         builder.setTitle(getResources().getString(R.string.result_popup_title));
         builder.setMessage(message);
         if(!correct){
@@ -95,32 +135,5 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
         });
         AlertDialog dialog = builder.create();
         dialog.show();
-    }
-
-    @Override
-    public void onClick(View view) {
-        switch(view.getId()){
-            case R.id.clear_button:
-                drawingView.clear();
-                break;
-            case R.id.next_button:
-                Bitmap bitmap = drawingView.getBitmap();
-                int bitmapWidth = bitmap.getWidth();
-                int bitmapHeight = bitmap.getHeight();
-                int[] pixels = new int[bitmap.getWidth() * bitmap.getHeight()];
-                bitmap.getPixels(pixels,0,bitmapWidth,0,0, bitmapWidth,bitmapHeight);
-                int pred = recognizer.getPrediction(bitmap);
-
-                boolean correct = (pred == toGuess);
-                String message = getResources().getString(R.string.result_popup_correct);
-                if(!correct) message = getResources().getString(R.string.result_popup_incorrect);
-                notifyUser(message, correct);
-
-                numCorrect += correct?1:0;
-                nextQuestion(correct);
-                break;
-            default:
-                break;
-        }
     }
 }
