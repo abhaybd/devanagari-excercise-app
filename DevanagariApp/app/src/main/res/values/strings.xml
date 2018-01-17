@@ -5,11 +5,13 @@
     <string name="Next">Next</string>
     <string name="start">Start</string>
 
+    <string name="draw_activity_play_sound">Play sound</string>
+
     <string name="result_popup_title">Result</string>
     <string name="result_popup_correct">Your answer was correct!</string>
     <string name="result_popup_incorrect">Your answer was incorrect!</string>
     <string name="result_popup_override">Override</string>
-    <string name="result_popup_ok">Ok</string>
+    <string name="result_popup_ok">OK</string>
 
     <string name="model_import_error_title">Error</string>
     <string name="model_import_error">There was an error loading the model!</string>
