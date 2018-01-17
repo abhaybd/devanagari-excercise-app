@@ -1,7 +1,9 @@
 package com.coolioasjulio.devanagariapp;
 
-public class SessionGenerator {
+import android.util.Log;
 
+public class SessionGenerator {
+    private static final String TAG = "SessionGenerator";
     private enum Mode {CYCLE, RANDOM};
     private int numCategories, sessionLength;
     private int generated;
@@ -13,6 +15,7 @@ public class SessionGenerator {
         this.sessionLength = sessionLength;
         incorrect = new int[numCategories];
         mode = Mode.CYCLE;
+        Log.d(TAG, "Mode: " + mode.name());
     }
 
     /**
@@ -30,6 +33,7 @@ public class SessionGenerator {
                 toReturn = generated % sessionLength;
                 if(generated >= numCategories - 1){
                     mode = Mode.RANDOM;
+                    Log.d(TAG, "Switching mode to: " + mode.name());
                 }
                 break;
 

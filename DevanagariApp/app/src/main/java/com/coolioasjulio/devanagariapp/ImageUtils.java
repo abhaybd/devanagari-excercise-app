@@ -147,6 +147,18 @@ public class ImageUtils {
 
     public static class PredictImageTask extends AsyncTask<Bitmap,Void,Integer>{
         private static final String TAG = "PredictImageTask";
+        // This is a super ugly and gross hack. The network didn't get the proper class mappings,
+        // since the classes weren't zero padded. Now, class 0 corresponds with class 10. However,
+        // it's actually supposed to be class 9, since the translation isn't 0 indexed. Ew. I know.
+        // So, where out is output of neural net, labels[out] - 1 == character.
+        private static final int[] labels = new int[]{
+                10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+                1,
+                20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+                2,
+                30, 31, 32, 33, 34, 35, 36,
+                3, 4, 5, 6, 7, 8, 9
+        };
 
         private PredictionCallback callback;
         private MultiLayerNetwork model;
@@ -164,7 +176,8 @@ public class ImageUtils {
             double[] flattened = ArrayUtil.flatten(image);
             int[] shape = new int[]{1, 1, image.length, image[0].length};
             INDArray input = Nd4j.create(flattened, shape, 'f');
-            return model.predict(input)[0];
+            int index = model.predict(input)[0];
+            return labels[index]-1; // Refer to comments at top of class.
         }
 
         @Override
