@@ -1,28 +1,75 @@
-apply plugin: 'com.android.application'
+apply plugin: "com.android.application"
 
 android {
     compileSdkVersion 26
     defaultConfig {
-        applicationId "com.coolioasjulio.draw"
+        applicationId "com.coolioasjulio.devanagariapp"
         minSdkVersion 15
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
     }
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            useProguard false
+            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
+    }
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/DEPENDENCIES.txt'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/INDEX.LIST'
+        exclude 'org/bytedeco/javacpp/windows-x86/msvcp120.dll'
+        exclude 'org/bytedeco/javacpp/windows-x86_64/msvcp120.dll'
+        exclude 'org/bytedeco/javacpp/windows-x86/msvcr120.dll'
+        exclude 'org/bytedeco/javacpp/windows-x86_64/msvcr120.dll'
+    }
+
+    configurations {
+        all*.exclude group: 'com.github.stephenc.findbugs', module: 'findbugs-annotations'
+        all*.exclude group: 'net.jcip', module: 'jcip-annotations'
+        all*.exclude group: 'com.google.code.findbugs', module: 'jsr305'
+    }
+
+    dexOptions{
+        jumboMode true
     }
 }
 
+ext {
+    dl4jVersion = "0.9.1"
+}
+
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:26.1.0'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation 'junit:junit:4.12'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+
+    annotationProcessor 'org.projectlombok:lombok:1.16.16'
+    implementation 'com.google.code.findbugs:annotations:3.0.1', {
+        exclude module: 'jsr305'
+        exclude module: 'jcip-annotations'
+    }
+
+    implementation "org.deeplearning4j:deeplearning4j-core:${dl4jVersion}"
+    implementation "org.deeplearning4j:deeplearning4j-modelimport:${dl4jVersion}"
+    implementation "ch.qos.logback:logback-classic:1.2.3"
+    implementation "org.nd4j:nd4j-native:${dl4jVersion}"
+    implementation "org.nd4j:nd4j-native:${dl4jVersion}:android-x86"
+    implementation "org.nd4j:nd4j-native:${dl4jVersion}:android-arm"
+    implementation 'org.bytedeco.javacpp-presets:openblas:0.2.20-1.3:android-x86'
+    implementation 'org.bytedeco.javacpp-presets:openblas:0.2.20-1.3:android-arm'
 }

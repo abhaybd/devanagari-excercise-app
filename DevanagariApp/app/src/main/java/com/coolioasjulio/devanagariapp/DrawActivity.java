@@ -5,11 +5,17 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.media.MediaPlayer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
+
+import java.util.Locale;
+
+import static com.coolioasjulio.devanagariapp.ImageUtils.PredictImageTask.PredictionCallback;
 
 public class DrawActivity extends AppCompatActivity implements View.OnClickListener{
     private static final String TAG = "DrawActivity";
@@ -21,6 +27,9 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
     private DrawingView drawingView;
     private SessionGenerator sessionGenerator;
     private Recognizer recognizer;
+    private Button clearButton, nextButton, playSoundButton;
+    private ProgressBar progressBar;
+    private MediaPlayer mediaPlayer;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,32 +39,119 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
         numQuestions = intent.getIntExtra(MainActivity.SESSION_LENGTH_KEY, 60);
         sessionGenerator = new SessionGenerator(NUM_CHARS,numQuestions);
 
-        recognizer = new Recognizer();
-
         drawingView = findViewById(R.id.scratch_pad);
         drawingView.initializePen();
         drawingView.setPenSize(55f);
         drawingView.setPenColor(Color.BLACK);
 
-        Button clear = findViewById(R.id.clear_button);
-        clear.setOnClickListener(this);
+        clearButton = findViewById(R.id.clear_button);
+        clearButton.setOnClickListener(this);
 
-        Button next = findViewById(R.id.next_button);
-        next.setOnClickListener(this);
+        nextButton = findViewById(R.id.next_button);
+        nextButton.setOnClickListener(this);
+
+        playSoundButton = findViewById(R.id.play_sound_button);
+        playSoundButton.setOnClickListener(this);
+
+        progressBar = findViewById(R.id.model_loading_spinner);
+        disableUI();
+        Runnable onReadyCallback = new Runnable() {
+            @Override
+            public void run() {
+                enableUI();
+                nextQuestion(false);
+            }
+        };
+        recognizer = new Recognizer(this, onReadyCallback);
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch(view.getId()){
+            case R.id.clear_button:
+                drawingView.clear();
+                break;
+            case R.id.play_sound_button:
+                playPrompt();
+                break;
+            case R.id.next_button:
+                mediaPlayer.release();
+                mediaPlayer = null;
+                disableUI();
+                Bitmap bitmap = drawingView.getBitmap();
+                PredictionCallback callback = new PredictionCallback() {
+                    @Override
+                    public void onFinished(int output) {
+                        boolean correct = (output == toGuess);
+                        Log.d(TAG, String.format("To guess: %s, Network output: %s", toGuess, output));
+                        String message = getResources().getString(R.string.result_popup_correct);
+                        if(!correct) message = getResources().getString(R.string.result_popup_incorrect);
+                        notifyUser(message, correct);
+
+                        numCorrect += correct?1:0;
+                        nextQuestion(correct);
+                        enableUI();
+                    }
+                };
+                recognizer.getPrediction(bitmap, callback);
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     * If the current mediaPlayer is still active, return it. Otherwise, init a new one.
+     * @param toGuess Character index for the user to guess.
+     * @return MediaPlayer instance pointing to the mp3 file denoted by `toGuess`.
+     */
+    private MediaPlayer getMediaPlayer(int toGuess){
+        if(mediaPlayer != null) return mediaPlayer;
+        String fileName = String.format(Locale.US, "aud%02d", toGuess);
+        Log.d(TAG, "Getting resource id for audio file: " + fileName);
+        int resID = getResources().getIdentifier(fileName,"raw", getPackageName());
+        return MediaPlayer.create(this, resID);
+    }
+
+    private void playPrompt(){
+        mediaPlayer = getMediaPlayer(toGuess);
+        if(!mediaPlayer.isPlaying()) mediaPlayer.start();
     }
 
     private void nextQuestion(boolean lastCorrect){
         elapsedQuestions++;
-        toGuess = sessionGenerator.next(lastCorrect);
         drawingView.clear();
-        if(elapsedQuestions == numQuestions){
-            Log.d(TAG,"Session finished!");
+        if(elapsedQuestions < numQuestions){
+            toGuess = sessionGenerator.next(lastCorrect);
+            playPrompt();
+        } else {
+            double accuracy = (double)numCorrect/(double)numQuestions;
+            Log.d(TAG,String.format("Session finished with accuracy: %.2f", accuracy));
+            nextButton.setClickable(false);
+            clearButton.setClickable(false);
         }
+    }
+
+    private void disableUI(){
+        progressBar.setVisibility(View.VISIBLE);
+        clearButton.setClickable(false);
+        nextButton.setClickable(false);
+        playSoundButton.setClickable(false);
+        drawingView.setDrawingEnabled(false);
+    }
+
+    private void enableUI(){
+        progressBar.setVisibility(View.GONE);
+        clearButton.setClickable(true);
+        nextButton.setClickable(true);
+        playSoundButton.setClickable(true);
+        drawingView.setDrawingEnabled(true);
+        drawingView.clear();
     }
 
     private void notifyUser(String message, boolean correct){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setCancelable(true);
+        builder.setCancelable(false);
         builder.setTitle(getResources().getString(R.string.result_popup_title));
         builder.setMessage(message);
         if(!correct){
@@ -75,32 +171,5 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
         });
         AlertDialog dialog = builder.create();
         dialog.show();
-    }
-
-    @Override
-    public void onClick(View view) {
-        switch(view.getId()){
-            case R.id.clear_button:
-                drawingView.clear();
-                break;
-            case R.id.next_button:
-                Bitmap bitmap = drawingView.getBitmap();
-                int bitmapWidth = bitmap.getWidth();
-                int bitmapHeight = bitmap.getHeight();
-                int[] pixels = new int[bitmap.getWidth() * bitmap.getHeight()];
-                bitmap.getPixels(pixels,0,bitmapWidth,0,0, bitmapWidth,bitmapHeight);
-                int pred = recognizer.getPrediction(bitmap);
-
-                boolean correct = (pred == toGuess);
-                String message = getResources().getString(R.string.result_popup_correct);
-                if(!correct) message = getResources().getString(R.string.result_popup_incorrect);
-                notifyUser(message, correct);
-
-                numCorrect += correct?1:0;
-                nextQuestion(correct);
-                break;
-            default:
-                break;
-        }
     }
 }

@@ -43,7 +43,7 @@ public class DrawingView extends View {
     }
 
     public Bitmap getBitmap(){
-        return mBitmap.copy(Bitmap.Config.ARGB_8888, true);
+        return mBitmap;
     }
 
     public void clear(){
@@ -55,6 +55,30 @@ public class DrawingView extends View {
         }
         onSizeChanged(w,h,w,h);
         invalidate();
+    }
+
+    public void disableDrawing(){
+        drawingEnabled = false;
+        mPaint.setAlpha(0);
+    }
+
+    public void enableDrawing(){
+        drawingEnabled = true;
+        mPaint.setAlpha(255);
+    }
+
+    public void setDrawingEnabled(boolean enabled){
+        if(enabled) enableDrawing();
+        else disableDrawing();
+    }
+
+    private boolean drawingEnabled;
+    public void toggleDrawingEnabled(){
+        setDrawingEnabled(!drawingEnabled);
+    }
+
+    public boolean isDrawingEnabled(){
+        return drawingEnabled;
     }
 
     private void init() {
