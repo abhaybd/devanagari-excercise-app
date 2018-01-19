@@ -12,18 +12,18 @@ import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, View.OnClickListener{
-    public static final String SESSION_LENGTH_KEY = "SESSION_LENGTH";
     private static final String TAG = "MAIN_ACTIVITY";
 
     private String currentSelection;
+    private List<String> options;
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         Spinner spinner = findViewById(R.id.session_spinner);
-        List<String> options = Arrays.asList(getResources().getStringArray(R.array.session_length));
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+        options = Arrays.asList(getResources().getStringArray(R.array.session_length_str));
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 this, android.R.layout.simple_spinner_dropdown_item, options);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
@@ -40,14 +40,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     @Override
-    public void onNothingSelected(AdapterView<?> adapterView) {
-
-    }
+    public void onNothingSelected(AdapterView<?> adapterView) {}
 
     @Override
     public void onClick(View view) {
         Intent intent = new Intent(this, DrawActivity.class);
-        intent.putExtra(SESSION_LENGTH_KEY, Integer.valueOf(currentSelection));
+        int index = options.indexOf(currentSelection);
+        if (index < 0) throw new AssertionError();
+        int[] intOptions = getResources().getIntArray(R.array.session_length_int);
+        intent.putExtra(Values.SESSION_LENGTH_KEY, intOptions[index]);
         startActivity(intent);
     }
 }

@@ -19,11 +19,10 @@ import static com.coolioasjulio.devanagariapp.ImageUtils.PredictImageTask.Predic
 
 public class DrawActivity extends AppCompatActivity implements View.OnClickListener{
     private static final String TAG = "DrawActivity";
-    private static final int NUM_CHARS = 36;
 
     private int toGuess;
     private int numCorrect;
-    private int numQuestions, elapsedQuestions;
+    private int sessionLength, elapsedQuestions;
     private DrawingView drawingView;
     private SessionGenerator sessionGenerator;
     private Recognizer recognizer;
@@ -36,8 +35,8 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_draw);
 
         Intent intent = getIntent();
-        numQuestions = intent.getIntExtra(MainActivity.SESSION_LENGTH_KEY, 60);
-        sessionGenerator = new SessionGenerator(NUM_CHARS,numQuestions);
+        sessionLength = intent.getIntExtra(Values.SESSION_LENGTH_KEY, 60);
+        sessionGenerator = new SessionGenerator(Values.NUM_CHARS, sessionLength);
 
         drawingView = findViewById(R.id.scratch_pad);
         drawingView.initializePen();
@@ -100,6 +99,13 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    private void startReviewActivity(){
+        Intent intent = new Intent(this, ReviewActivity.class);
+        intent.putExtra(Values.SESSION_LENGTH_KEY, sessionLength);
+        intent.putExtra(Values.NUM_CORRECT_KEY, numCorrect);
+        startActivity(intent);
+    }
+
     /**
      * If the current mediaPlayer is still active, return it. Otherwise, init a new one.
      * @param toGuess Character index for the user to guess.
@@ -121,14 +127,15 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
     private void nextQuestion(boolean lastCorrect){
         elapsedQuestions++;
         drawingView.clear();
-        if(elapsedQuestions < numQuestions){
+        if(elapsedQuestions < sessionLength){
             toGuess = sessionGenerator.next(lastCorrect);
             playPrompt();
         } else {
-            double accuracy = (double)numCorrect/(double)numQuestions;
+            double accuracy = (double)numCorrect/(double)sessionLength;
             Log.d(TAG,String.format("Session finished with accuracy: %.2f", accuracy));
             nextButton.setClickable(false);
             clearButton.setClickable(false);
+            startReviewActivity();
         }
     }
 

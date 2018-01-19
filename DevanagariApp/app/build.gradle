@@ -40,7 +40,7 @@ android {
         all*.exclude group: 'com.google.code.findbugs', module: 'jsr305'
     }
 
-    dexOptions{
+    dexOptions {
         jumboMode true
     }
 }
@@ -48,6 +48,7 @@ android {
 ext {
     dl4jVersion = "0.9.1"
 }
+
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')

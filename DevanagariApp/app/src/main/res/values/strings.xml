@@ -1,11 +1,18 @@
 <resources>
     <string name="app_name">Draw</string>
-    <string name="title">Devanagari</string>
-    <string name="Clear">Clear</string>
-    <string name="Next">Next</string>
-    <string name="start">Start</string>
 
+    <string name="main_activity_title">Devanagari</string>
+    <string name="main_activity_start">Start</string>
+
+    <string name="draw_activity_clear">Clear</string>
+    <string name="draw_activity_next">Next</string>
     <string name="draw_activity_play_sound">Play sound</string>
+
+    <string name="review_activity_title">Session Review</string>
+    <string name="review_activity_correct">Correct</string>
+    <string name="review_activity_questions">Total Questions</string>
+    <string name="review_activity_accuracy">Accuracy</string>
+    <string name="review_activity_main_menu">Main Menu</string>
 
     <string name="result_popup_title">Result</string>
     <string name="result_popup_correct">Your answer was correct!</string>
@@ -16,9 +23,15 @@
     <string name="model_import_error_title">Error</string>
     <string name="model_import_error">There was an error loading the model!</string>
 
-    <string-array name="session_length">
-        <item>"20"</item>
-        <item>"40"</item>
-        <item>"60"</item>
+    <string-array name="session_length_str">
+        <item>20</item>
+        <item>40</item>
+        <item>60</item>
     </string-array>
+
+    <integer-array name="session_length_int">
+        <item>20</item>
+        <item>40</item>
+        <item>60</item>
+    </integer-array>
 </resources>
