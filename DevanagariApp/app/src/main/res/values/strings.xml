@@ -25,13 +25,13 @@
 
     <string-array name="session_length_str">
         <item>20</item>
-        <item>40</item>
-        <item>60</item>
+        <item>50</item>
+        <item>100</item>
     </string-array>
 
     <integer-array name="session_length_int">
         <item>20</item>
-        <item>40</item>
-        <item>60</item>
+        <item>50</item>
+        <item>100</item>
     </integer-array>
 </resources>

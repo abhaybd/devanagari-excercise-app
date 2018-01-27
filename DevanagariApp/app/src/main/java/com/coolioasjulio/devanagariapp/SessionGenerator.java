@@ -2,20 +2,56 @@ package com.coolioasjulio.devanagariapp;
 
 import android.util.Log;
 
+import java.util.Random;
+
 public class SessionGenerator {
     private static final String TAG = "SessionGenerator";
-    private enum Mode {CYCLE, RANDOM};
+    private enum Mode {
+        CYCLE,
+        RANDOM
+    }
+    private Mode mode;
     private int numCategories, sessionLength;
     private int generated;
-    private Mode mode;
-    private int[] incorrect;
     private int lastGenerated = -1;
+    private int[] incorrect;
+    private int[] numbers;
+
     public SessionGenerator(int numCategories, int sessionLength){
+        this(numCategories, sessionLength, true);
+    }
+
+    public SessionGenerator(int numCategories, int sessionLength, boolean shuffled){
         this.numCategories = numCategories;
         this.sessionLength = sessionLength;
         incorrect = new int[numCategories];
         mode = Mode.CYCLE;
         Log.d(TAG, "Mode: " + mode.name());
+        if(shuffled) {
+            numbers = shuffledArray(numCategories);
+        } else {
+            numbers = orderedArray(numCategories);
+        }
+    }
+
+    private int[] orderedArray(int size){
+        int[] numbers = new int[size];
+        for(int i = 0; i < size; i++){
+            numbers[i] = i;
+        }
+        return numbers;
+    }
+
+    private int[] shuffledArray(int size){
+        int[] numbers = orderedArray(size);
+        Random random = new Random();
+        for(int i = 0; i < numbers.length; i++){
+            int swapIndex = random.nextInt(numbers.length);
+            int temp = numbers[swapIndex];
+            numbers[swapIndex] = numbers[i];
+            numbers[i] = temp;
+        }
+        return numbers;
     }
 
     /**
@@ -30,7 +66,7 @@ public class SessionGenerator {
         int toReturn = 0;
         switch(mode){
             case CYCLE:
-                toReturn = generated % sessionLength;
+                toReturn = numbers[generated%sessionLength];
                 if(generated >= numCategories - 1){
                     mode = Mode.RANDOM;
                     Log.d(TAG, "Switching mode to: " + mode.name());
@@ -54,6 +90,11 @@ public class SessionGenerator {
         return toReturn;
     }
 
+    /**
+     * Perform softmax activation on the number of times each letter was wrong.
+     * @param arr Number of times each letter was incorrectly answered.
+     * @return double[] of probabilities. The sum of this array is 1.
+     */
     private double[] getProbabilities(int[] arr){
         double[] probabilities = new double[arr.length];
         double denominator = 0;
