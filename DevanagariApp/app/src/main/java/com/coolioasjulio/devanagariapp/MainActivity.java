@@ -8,7 +8,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, View.OnClickListener{
@@ -16,13 +16,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private String currentSelection;
     private List<String> options;
+    private int[] intOptions;
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         Spinner spinner = findViewById(R.id.session_spinner);
-        options = Arrays.asList(getResources().getStringArray(R.array.session_length_str));
+
+        intOptions = getResources().getIntArray(R.array.session_length);
+        options = new ArrayList<>();
+        for(int length: intOptions){
+            options.add(String.format(Values.LOCALE, "%d", length));
+        }
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 this, android.R.layout.simple_spinner_dropdown_item, options);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -47,7 +53,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         Intent intent = new Intent(this, DrawActivity.class);
         int index = options.indexOf(currentSelection);
         if (index < 0) throw new AssertionError();
-        int[] intOptions = getResources().getIntArray(R.array.session_length_int);
         intent.putExtra(Values.SESSION_LENGTH_KEY, intOptions[index]);
         startActivity(intent);
     }

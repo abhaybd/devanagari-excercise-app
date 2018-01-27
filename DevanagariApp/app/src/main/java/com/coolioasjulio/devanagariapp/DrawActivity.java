@@ -14,6 +14,8 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 
 import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static com.coolioasjulio.devanagariapp.ImageUtils.PredictImageTask.PredictionCallback;
 
@@ -29,6 +31,7 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
     private Button clearButton, nextButton, playSoundButton;
     private ProgressBar progressBar;
     private MediaPlayer mediaPlayer;
+    private Timer timer;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,6 +62,7 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
             public void run() {
                 enableUI();
                 nextQuestion(false);
+                setTimer();
             }
         };
         recognizer = new Recognizer(this, onReadyCallback);
@@ -74,8 +78,7 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
                 playPrompt();
                 break;
             case R.id.next_button:
-                mediaPlayer.release();
-                mediaPlayer = null;
+                releaseMediaPlayer();
                 disableUI();
                 Bitmap bitmap = drawingView.getBitmap();
                 PredictionCallback callback = new PredictionCallback() {
@@ -119,9 +122,32 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
         return MediaPlayer.create(this, resID);
     }
 
+    private void releaseMediaPlayer(){
+        if(mediaPlayer.isPlaying()) mediaPlayer.stop();
+        mediaPlayer.release();
+        mediaPlayer = null;
+    }
+
     private void playPrompt(){
         mediaPlayer = getMediaPlayer(toGuess);
         if(!mediaPlayer.isPlaying()) mediaPlayer.start();
+    }
+
+    private void setTimer(){
+        if(timer != null) timer.cancel();
+        timer = new Timer(true);
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        releaseMediaPlayer();
+                        nextQuestion(false);
+                    }
+                });
+            }
+        }, 10000); // TODO: Implement the intent from the main activity. CHANGE THIS.
     }
 
     private void nextQuestion(boolean lastCorrect){
@@ -129,12 +155,15 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
         drawingView.clear();
         if(elapsedQuestions < sessionLength){
             toGuess = sessionGenerator.next(lastCorrect);
+            Log.d(TAG, String.format(Values.LOCALE, "New toGuess: %d", toGuess));
             playPrompt();
+            setTimer();
         } else {
             double accuracy = (double)numCorrect/(double)sessionLength;
             Log.d(TAG,String.format("Session finished with accuracy: %.2f", accuracy));
             nextButton.setClickable(false);
             clearButton.setClickable(false);
+            timer.cancel();
             startReviewActivity();
         }
     }

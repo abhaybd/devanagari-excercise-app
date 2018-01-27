@@ -28,7 +28,7 @@ public class ReviewActivity extends AppCompatActivity implements View.OnClickLis
         String accuracyText = getResources().getString(R.string.review_activity_accuracy);
 
         TextView textView = findViewById(R.id.review_activity_statistics);
-        textView.setText(String.format(Locale.US,
+        textView.setText(String.format(Values.LOCALE,
                 "%s: %s\n" +
                 "%s: %s\n" +
                 "%s: %.2f%%",

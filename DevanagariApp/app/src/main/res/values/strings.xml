@@ -23,13 +23,7 @@
     <string name="model_import_error_title">Error</string>
     <string name="model_import_error">There was an error loading the model!</string>
 
-    <string-array name="session_length_str">
-        <item>20</item>
-        <item>50</item>
-        <item>100</item>
-    </string-array>
-
-    <integer-array name="session_length_int">
+    <integer-array name="session_length">
         <item>20</item>
         <item>50</item>
         <item>100</item>
