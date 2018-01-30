@@ -13,6 +13,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -24,6 +26,7 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
 
     private int toGuess;
     private int numCorrect;
+    private int timeout;
     private int sessionLength, elapsedQuestions;
     private DrawingView drawingView;
     private SessionGenerator sessionGenerator;
@@ -37,8 +40,11 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_draw);
 
+        int defaultTimeout = getResources().getInteger(R.integer.default_timeout);
+
         Intent intent = getIntent();
-        sessionLength = intent.getIntExtra(Values.SESSION_LENGTH_KEY, 60);
+        timeout = intent.getIntExtra(Values.TIMEOUT_KEY, defaultTimeout);
+        sessionLength = intent.getIntExtra(Values.SESSION_LENGTH_KEY, 50);
         sessionGenerator = new SessionGenerator(Values.NUM_CHARS, sessionLength);
 
         drawingView = findViewById(R.id.scratch_pad);
@@ -62,7 +68,6 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
             public void run() {
                 enableUI();
                 nextQuestion(false);
-                setTimer();
             }
         };
         recognizer = new Recognizer(this, onReadyCallback);
@@ -130,7 +135,15 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
 
     private void playPrompt(){
         mediaPlayer = getMediaPlayer(toGuess);
-        if(!mediaPlayer.isPlaying()) mediaPlayer.start();
+        if(!mediaPlayer.isPlaying()) {
+            mediaPlayer.start();
+            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mediaPlayer) {
+                    setTimer();
+                }
+            });
+        }
     }
 
     private void setTimer(){
@@ -147,7 +160,7 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 });
             }
-        }, 10000); // TODO: Implement the intent from the main activity. CHANGE THIS.
+        }, timeout * 1000); // Convert seconds to milliseconds
     }
 
     private void nextQuestion(boolean lastCorrect){
@@ -157,7 +170,6 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
             toGuess = sessionGenerator.next(lastCorrect);
             Log.d(TAG, String.format(Values.LOCALE, "New toGuess: %d", toGuess));
             playPrompt();
-            setTimer();
         } else {
             double accuracy = (double)numCorrect/(double)sessionLength;
             Log.d(TAG,String.format("Session finished with accuracy: %.2f", accuracy));
