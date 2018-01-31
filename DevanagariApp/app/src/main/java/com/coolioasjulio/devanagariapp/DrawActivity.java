@@ -165,7 +165,9 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void run() {
                         releaseMediaPlayer();
-                        nextQuestion(false);
+                        String msg = getResources().getString(R.string.result_popup_timeout);
+                        msg = String.format("%s %s", msg, SessionGenerator.toLetter(toGuess));
+                        notifyUser(msg,false);
                     }
                 });
             }

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Draw</string>
+    <string name="app_name">Devanagari</string>
 
     <string name="main_activity_title">Devanagari</string>
     <string name="main_activity_start">Start</string>
@@ -20,6 +20,7 @@
     <string name="review_activity_main_menu">Main Menu</string>
 
     <string name="result_popup_title">Result</string>
+    <string name="result_popup_timeout">You took too long to answer! Correct answer:</string>
     <string name="result_popup_correct">Your answer was correct!</string>
     <string name="result_popup_incorrect">Your answer was incorrect! Correct answer:</string>
     <string name="result_popup_override">Override</string>
