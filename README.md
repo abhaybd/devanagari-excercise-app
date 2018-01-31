@@ -8,5 +8,4 @@ Android app to help kids learn to read in Devanagari
 - [X] Add results overview activity to be shown after session
 - [X] Add timeout to automatically cancel if the user waits too long
 - [X] Disable next button until the user inputs something
-
-#### It looks like we're all done, folks! Hopefully, that is...
+- [ ] Translate strings.xml to hindi and marathi
