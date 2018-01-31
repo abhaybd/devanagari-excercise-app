@@ -1,6 +1,7 @@
 package com.coolioasjulio.devanagariapp;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -31,16 +32,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         timeoutInput = findViewById(R.id.timeout);
 
         // Set the timeout to the default timeout
-        String defaultTimeout = String.format(Values.LOCALE, "%d",
-                getResources().getInteger(R.integer.default_timeout));
+        String defaultTimeout = String.valueOf(getResources().getInteger(R.integer.default_timeout));
         timeoutInput.setText(defaultTimeout);
 
         intOptions = getResources().getIntArray(R.array.session_length);
         options = new ArrayList<>();
-        NumberFormat nf = NumberFormat.getNumberInstance(new Locale("hi", "IN"));
+
+        Log.d(TAG, NumberFormat.getInstance().format(1));
         for(int length: intOptions){
-            options.add(nf.format(length));
-            Log.d(TAG, nf.format(length));
+            options.add(Localization.localizeInteger(length));
+            Log.d(TAG, Localization.localizeInteger(length));
         }
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 this, android.R.layout.simple_spinner_dropdown_item, options);

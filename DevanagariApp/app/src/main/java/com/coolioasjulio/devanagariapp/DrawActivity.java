@@ -13,8 +13,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 
-import java.text.NumberFormat;
-import java.text.ParseException;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -96,8 +94,6 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
                         notifyUser(message, correct);
 
                         numCorrect += correct?1:0;
-                        nextQuestion(correct);
-                        enableUI();
                     }
                 };
                 recognizer.getPrediction(bitmap, callback);
@@ -197,7 +193,7 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
         drawingView.clear();
     }
 
-    private void notifyUser(String message, boolean correct){
+    private void notifyUser(String message, final boolean correct){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setCancelable(false);
         builder.setTitle(getResources().getString(R.string.result_popup_title));
@@ -218,6 +214,13 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
         AlertDialog dialog = builder.create();
+        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+                nextQuestion(correct);
+                enableUI();
+            }
+        });
         dialog.show();
     }
 }

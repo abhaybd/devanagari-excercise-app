@@ -31,9 +31,10 @@ public class ReviewActivity extends AppCompatActivity implements View.OnClickLis
         textView.setText(String.format(Values.LOCALE,
                 "%s: %s\n" +
                 "%s: %s\n" +
-                "%s: %.2f%%",
-                correctText, numCorrect, totalQuestionsText,
-                sessionLength, accuracyText, accuracy*100d));
+                "%s: %s%%",
+                correctText, Localization.localizeInteger(numCorrect), totalQuestionsText,
+                Localization.localizeInteger(sessionLength), accuracyText,
+                Localization.localize(accuracy*100d, "%.2f")));
 
         Button mainMenu = findViewById(R.id.review_activity_main_menu);
         mainMenu.setOnClickListener(this);
