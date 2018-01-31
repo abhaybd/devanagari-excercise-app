@@ -21,7 +21,7 @@
 
     <string name="result_popup_title">Result</string>
     <string name="result_popup_correct">Your answer was correct!</string>
-    <string name="result_popup_incorrect">Your answer was incorrect!</string>
+    <string name="result_popup_incorrect">Your answer was incorrect! Correct answer:</string>
     <string name="result_popup_override">Override</string>
     <string name="result_popup_ok">OK</string>
 

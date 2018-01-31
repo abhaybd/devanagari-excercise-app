@@ -90,7 +90,12 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
                         boolean correct = (output == toGuess);
                         Log.d(TAG, String.format("To guess: %s, Network output: %s", toGuess, output));
                         String message = getResources().getString(R.string.result_popup_correct);
-                        if(!correct) message = getResources().getString(R.string.result_popup_incorrect);
+                        if(!correct) {
+                            String correctLetter = SessionGenerator.toLetter(toGuess);
+                            message = String.format("%s %s",
+                                    getResources().getString(R.string.result_popup_incorrect),
+                                    correctLetter);
+                        }
                         notifyUser(message, correct);
 
                         numCorrect += correct?1:0;
