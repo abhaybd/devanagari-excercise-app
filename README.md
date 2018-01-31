@@ -7,4 +7,6 @@ Android app to help kids learn to read in Devanagari
 - [X] Add in correct answer on incorrect guess
 - [X] Add results overview activity to be shown after session
 - [X] Add timeout to automatically cancel if the user waits too long
-- [ ] Disable next button until the user inputs something
+- [X] Disable next button until the user inputs something
+
+#### It looks like we're all done, folks! Hopefully, that is...
