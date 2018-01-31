@@ -59,6 +59,13 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
         playSoundButton = findViewById(R.id.play_sound_button);
         playSoundButton.setOnClickListener(this);
 
+        drawingView.setOnTouchDownEvent(new Runnable() {
+            @Override
+            public void run() {
+                if(!nextButton.isEnabled()) nextButton.setEnabled(true);
+            }
+        });
+
         progressBar = findViewById(R.id.model_loading_spinner);
         disableUI();
         Runnable onReadyCallback = new Runnable() {
@@ -76,6 +83,7 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
         switch(view.getId()){
             case R.id.clear_button:
                 drawingView.clear();
+                nextButton.setEnabled(false);
                 break;
             case R.id.play_sound_button:
                 playPrompt();
@@ -174,8 +182,8 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
         } else {
             double accuracy = (double)numCorrect/(double)sessionLength;
             Log.d(TAG,String.format("Session finished with accuracy: %.2f", accuracy));
-            nextButton.setClickable(false);
-            clearButton.setClickable(false);
+            nextButton.setEnabled(false);
+            clearButton.setEnabled(false);
             timer.cancel();
             startReviewActivity();
         }
@@ -183,17 +191,16 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
 
     private void disableUI(){
         progressBar.setVisibility(View.VISIBLE);
-        clearButton.setClickable(false);
-        nextButton.setClickable(false);
-        playSoundButton.setClickable(false);
+        clearButton.setEnabled(false);
+        nextButton.setEnabled(false);
+        playSoundButton.setEnabled(false);
         drawingView.setDrawingEnabled(false);
     }
 
     private void enableUI(){
         progressBar.setVisibility(View.GONE);
-        clearButton.setClickable(true);
-        nextButton.setClickable(true);
-        playSoundButton.setClickable(true);
+        clearButton.setEnabled(true);
+        playSoundButton.setEnabled(true);
         drawingView.setDrawingEnabled(true);
         drawingView.clear();
     }

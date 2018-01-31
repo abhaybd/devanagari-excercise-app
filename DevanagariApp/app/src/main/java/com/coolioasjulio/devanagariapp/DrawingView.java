@@ -27,6 +27,8 @@ public class DrawingView extends View {
     private boolean mDrawMode;
     private float mX, mY;
     private float mPenSize = 10;
+    private Runnable onTouchDownEvent;
+
     private float mEraserSize = 10;
 
     public DrawingView(Context c) {
@@ -40,6 +42,10 @@ public class DrawingView extends View {
     public DrawingView(Context c, AttributeSet attrs, int defStyle) {
         super(c, attrs, defStyle);
         init();
+    }
+
+    public void setOnTouchDownEvent(Runnable onTouchDownEvent){
+        this.onTouchDownEvent = onTouchDownEvent;
     }
 
     public Bitmap getBitmap(){
@@ -71,8 +77,8 @@ public class DrawingView extends View {
         if(enabled) enableDrawing();
         else disableDrawing();
     }
-
     private boolean drawingEnabled;
+
     public void toggleDrawingEnabled(){
         setDrawingEnabled(!drawingEnabled);
     }
@@ -149,6 +155,7 @@ public class DrawingView extends View {
         float y = event.getY();
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
+                if(onTouchDownEvent != null) onTouchDownEvent.run();
                 if (!mDrawMode) {
                     mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
                 } else {
