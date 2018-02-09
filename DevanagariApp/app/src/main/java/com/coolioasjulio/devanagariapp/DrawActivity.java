@@ -16,6 +16,7 @@ import android.widget.ProgressBar;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.coolioasjulio.devanagariapp.ImageUtils.PredictImageTask.PredictionCallback;
 
@@ -99,7 +100,7 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
                         Log.d(TAG, String.format("To guess: %s, Network output: %s", toGuess, output));
                         String message = getResources().getString(R.string.result_popup_correct);
                         if(!correct) {
-                            String correctLetter = SessionGenerator.toLetter(toGuess);
+                            String correctLetter = Values.toLetter(toGuess);
                             message = String.format("%s %s",
                                     getResources().getString(R.string.result_popup_incorrect),
                                     correctLetter);
@@ -120,6 +121,7 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
         Intent intent = new Intent(this, ReviewActivity.class);
         intent.putExtra(Values.SESSION_LENGTH_KEY, sessionLength);
         intent.putExtra(Values.NUM_CORRECT_KEY, numCorrect);
+        intent.putExtra(Values.INCORRECT_BREAKDOWN_KEY, sessionGenerator.getIncorrectRecord());
         startActivity(intent);
     }
 
@@ -166,7 +168,7 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
                     public void run() {
                         releaseMediaPlayer();
                         String msg = getResources().getString(R.string.result_popup_timeout);
-                        msg = String.format("%s %s", msg, SessionGenerator.toLetter(toGuess));
+                        msg = String.format("%s %s", msg, Values.toLetter(toGuess));
                         notifyUser(msg,false);
                     }
                 });
@@ -207,16 +209,20 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
         drawingView.clear();
     }
 
-    private void notifyUser(String message, final boolean correct){
+    private void notifyUser(String message, boolean correct){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setCancelable(false);
         builder.setTitle(getResources().getString(R.string.result_popup_title));
         builder.setMessage(message);
+
+        // gross workaround so it can be overridden by the button press (in the callback)
+        final AtomicBoolean ab = new AtomicBoolean(correct);
         if(!correct){
             builder.setNegativeButton(getResources().getString(R.string.result_popup_override), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
                     numCorrect++;
+                    ab.set(true);
                     dialogInterface.dismiss();
                 }
             });
@@ -231,7 +237,7 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialogInterface) {
-                nextQuestion(correct);
+                nextQuestion(ab.get());
                 enableUI();
             }
         });

@@ -6,13 +6,6 @@ import java.util.Random;
 
 public class SessionGenerator {
     private static final String TAG = "SessionGenerator";
-    private static final int START = 0x915;
-    private static final String[] intToLetter = new String[]{
-            "क","ख","ग","घ","ङ","च","छ","ज","झ","ञ",
-            "ट","ठ","ड","ढ","ण","त","थ","द","ध","न",
-            "प","फ","ब","भ","म","य","र","ल","व","श",
-            "ष","स","ह","क्ष","त्र","ज्ञ"
-    };
 
     private enum Mode {
         CYCLE,
@@ -24,10 +17,6 @@ public class SessionGenerator {
     private int lastGenerated = -1;
     private int[] incorrect;
     private int[] numbers;
-
-    public static String toLetter(int character){
-        return intToLetter[character];
-    }
 
     public SessionGenerator(int numCategories, int sessionLength){
         this(numCategories, sessionLength, true);
@@ -44,6 +33,18 @@ public class SessionGenerator {
         } else {
             numbers = orderedArray(numCategories);
         }
+    }
+
+    /**
+     * Clone incorrect array and return it.
+     * @return Cloned incorrect array. Modifying this will not change the internal array of this class.
+     */
+    public int[] getIncorrectRecord(){
+        int[] toReturn = new int[incorrect.length];
+        for(int i = 0; i < toReturn.length; i++){
+            toReturn[i] = incorrect[i];
+        }
+        return toReturn;
     }
 
     private int[] orderedArray(int size){
