@@ -42,7 +42,7 @@ public class ReviewActivity extends AppCompatActivity implements View.OnClickLis
         String incorrectText = getResources().getString(R.string.review_activity_incorrect);
         for(int letter = 0; letter < incorrectRecord.length; letter++){
             int numIncorrect = incorrectRecord[letter];
-            String letterString = Values.toLetter(letter);
+            String letterString = Values.toLetter(this, letter);
             sb.append(String.format(Values.LOCALE, "%s - %d %s\n",
                     letterString, numIncorrect, incorrectText));
         }

@@ -1,6 +1,8 @@
 package com.coolioasjulio.devanagariapp;
 
 
+import android.content.Context;
+
 import java.util.Locale;
 
 public class Values {
@@ -14,14 +16,8 @@ public class Values {
     //public static final Locale LOCALE = Locale.US;
     public static final Locale LOCALE = new Locale("hi","IN");
 
-    private static final String[] intToLetter = new String[]{
-            "क","ख","ग","घ","ङ","च","छ","ज","झ","ञ",
-            "ट","ठ","ड","ढ","ण","त","थ","द","ध","न",
-            "प","फ","ब","भ","म","य","र","ल","व","श",
-            "ष","स","ह","क्ष","त्र","ज्ञ"
-    };
-
-    public static String toLetter(int character){
-        return intToLetter[character];
+    public static String toLetter(Context c, int character){
+        String[] letters = c.getResources().getStringArray(R.array.letters);
+        return letters[character];
     }
 }

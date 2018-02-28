@@ -1,6 +1,7 @@
 package com.coolioasjulio.devanagariapp;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -12,6 +13,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import java.util.Locale;
 import java.util.Timer;
@@ -34,6 +36,8 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
     private ProgressBar progressBar;
     private MediaPlayer mediaPlayer;
     private Timer timer;
+    private Context context;
+    private TextView correctLabel, incorrectLabel;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,6 +49,12 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
         timeout = intent.getIntExtra(Values.TIMEOUT_KEY, defaultTimeout);
         sessionLength = intent.getIntExtra(Values.SESSION_LENGTH_KEY, 50);
         sessionGenerator = new SessionGenerator(Values.NUM_CHARS, sessionLength);
+
+        this.context = this;
+
+        correctLabel = findViewById(R.id.correct_label);
+        incorrectLabel = findViewById(R.id.incorrect_label);
+        updateScore();
 
         drawingView = findViewById(R.id.scratch_pad);
         drawingView.initializePen();
@@ -100,7 +110,7 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
                         Log.d(TAG, String.format("To guess: %s, Network output: %s", toGuess, output));
                         String message = getResources().getString(R.string.result_popup_correct);
                         if(!correct) {
-                            String correctLetter = Values.toLetter(toGuess);
+                            String correctLetter = Values.toLetter(context, toGuess);
                             message = String.format("%s %s",
                                     getResources().getString(R.string.result_popup_incorrect),
                                     correctLetter);
@@ -115,6 +125,11 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
             default:
                 break;
         }
+    }
+
+    private void updateScore(){
+        correctLabel.setText(getString(R.string.draw_activity_correct, numCorrect));
+        incorrectLabel.setText(getString(R.string.draw_activity_incorrect, elapsedQuestions - numCorrect));
     }
 
     private void startReviewActivity(){
@@ -168,7 +183,7 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
                     public void run() {
                         releaseMediaPlayer();
                         String msg = getResources().getString(R.string.result_popup_timeout);
-                        msg = String.format("%s %s", msg, Values.toLetter(toGuess));
+                        msg = String.format("%s %s", msg, Values.toLetter(context,toGuess));
                         notifyUser(msg,false);
                     }
                 });
@@ -211,7 +226,7 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
 
     private void notifyUser(String message, boolean correct){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setCancelable(false);
+        builder.setCancelable(correct); // Cancelable if correct, explicit button press if incorrect
         builder.setTitle(getResources().getString(R.string.result_popup_title));
         builder.setMessage(message);
 
@@ -237,6 +252,7 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialogInterface) {
+                updateScore();
                 nextQuestion(ab.get());
                 enableUI();
             }

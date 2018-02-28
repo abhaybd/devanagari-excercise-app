@@ -14,6 +14,8 @@
     <string name="draw_activity_clear">Clear</string>
     <string name="draw_activity_next">Next</string>
     <string name="draw_activity_play_sound">Play sound</string>
+    <string name="draw_activity_correct">Correct: %d</string>
+    <string name="draw_activity_incorrect">Incorrect: %d</string>
 
     <string name="review_activity_title">Session Review</string>
     <string name="review_activity_correct">Correct</string>
@@ -37,4 +39,43 @@
         <item>50</item>
         <item>100</item>
     </integer-array>
+
+    <string-array name="letters">
+        <item>"क"</item>
+        <item>"ख"</item>
+        <item>"ग"</item>
+        <item>"घ"</item>
+        <item>"ङ"</item>
+        <item>"च"</item>
+        <item>"छ"</item>
+        <item>"ज"</item>
+        <item>"झ"</item>
+        <item>"ञ"</item>
+        <item>"ट"</item>
+        <item>"ठ"</item>
+        <item>"ड"</item>
+        <item>"ढ"</item>
+        <item>"ण"</item>
+        <item>"त"</item>
+        <item>"थ"</item>
+        <item>"द"</item>
+        <item>"ध"</item>
+        <item>"न"</item>
+        <item>"प"</item>
+        <item>"फ"</item>
+        <item>"ब"</item>
+        <item>"भ"</item>
+        <item>"म"</item>
+        <item>"य"</item>
+        <item>"र"</item>
+        <item>"ल"</item>
+        <item>"व"</item>
+        <item>"श"</item>
+        <item>"ष"</item>
+        <item>"स"</item>
+        <item>"ह"</item>
+        <item>"क्ष"</item>
+        <item>"त्र"</item>
+        <item>"ज्ञ"</item>
+    </string-array>
 </resources>
