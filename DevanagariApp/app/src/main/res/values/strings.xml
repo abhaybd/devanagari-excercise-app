@@ -5,6 +5,7 @@
 
     <string name="main_activity_title">Devanagari</string>
     <string name="main_activity_start">Start</string>
+    <string name="main_activity_infinite">Infinite Mode</string>
 
     <integer name="default_timeout">30</integer>
     <string name="timeout">Timeout:</string>

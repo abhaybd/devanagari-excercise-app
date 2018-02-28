@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
@@ -51,7 +52,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         currentSelection = options.get(0);
 
         spinner.setOnItemSelectedListener(this);
-        findViewById(R.id.start_button).setOnClickListener(this);
+
+        Button startButton = findViewById(R.id.start_button);
+        startButton.setOnClickListener(this);
+
+        Button infiniteButton = findViewById(R.id.infinite_button);
+        infiniteButton.setOnClickListener(this);
     }
 
     @Override
@@ -64,14 +70,27 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public void onClick(View view) {
-        int index = options.indexOf(currentSelection);
-        if (index < 0) throw new AssertionError();
+        Intent intent;
+        switch(view.getId()){
+            case R.id.infinite_button:
+                intent = new Intent(this, InfiniteActivity.class);
+                startActivity(intent);
+                break;
 
-        int timeout = Integer.parseInt(timeoutInput.getText().toString());
+            case R.id.start_button:
+                int index = options.indexOf(currentSelection);
+                if (index < 0) throw new AssertionError();
 
-        Intent intent = new Intent(this, DrawActivity.class);
-        intent.putExtra(Values.SESSION_LENGTH_KEY, intOptions[index]);
-        intent.putExtra(Values.TIMEOUT_KEY, timeout);
-        startActivity(intent);
+                int timeout = Integer.parseInt(timeoutInput.getText().toString());
+
+                intent = new Intent(this, DrawActivity.class);
+                intent.putExtra(Values.SESSION_LENGTH_KEY, intOptions[index]);
+                intent.putExtra(Values.TIMEOUT_KEY, timeout);
+                startActivity(intent);
+                break;
+
+            default:
+                break;
+        }
     }
 }
