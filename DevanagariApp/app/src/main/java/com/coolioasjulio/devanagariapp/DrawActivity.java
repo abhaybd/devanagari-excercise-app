@@ -166,27 +166,32 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
             mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mediaPlayer) {
-                    setTimer();
+                    setTimer(timeout, new Runnable() {
+                        @Override
+                        public void run() {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    releaseMediaPlayer();
+                                    String msg = getResources().getString(R.string.result_popup_timeout);
+                                    msg = String.format("%s %s", msg, Values.toLetter(context,toGuess));
+                                    notifyUser(msg,false);
+                                }
+                            });
+                        }
+                    });
                 }
             });
         }
     }
 
-    private void setTimer(){
+    private void setTimer(int timeout, final Runnable onTimer){
         if(timer != null) timer.cancel();
         timer = new Timer(true);
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        releaseMediaPlayer();
-                        String msg = getResources().getString(R.string.result_popup_timeout);
-                        msg = String.format("%s %s", msg, Values.toLetter(context,toGuess));
-                        notifyUser(msg,false);
-                    }
-                });
+                onTimer.run();
             }
         }, timeout * 1000); // Convert seconds to milliseconds
     }
@@ -248,7 +253,7 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
                 dialogInterface.dismiss();
             }
         });
-        AlertDialog dialog = builder.create();
+        final AlertDialog dialog = builder.create();
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialogInterface) {
@@ -258,5 +263,19 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
         dialog.show();
+
+        if(correct) {
+            setTimer(Values.CORRECT_PROMPT_TIMEOUT, new Runnable() {
+                @Override
+                public void run() {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            dialog.dismiss();
+                        }
+                    });
+                }
+            });
+        }
     }
 }

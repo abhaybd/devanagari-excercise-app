@@ -13,6 +13,8 @@ public class Values {
     public static final String NUM_CORRECT_KEY         = "NUM_CORRECT";
     public static final String INCORRECT_BREAKDOWN_KEY = "SCORE_BREAKDOWN";
 
+    public static final int CORRECT_PROMPT_TIMEOUT     = 1; // in seconds
+
     //public static final Locale LOCALE = Locale.US;
     public static final Locale LOCALE = new Locale("hi","IN");
 

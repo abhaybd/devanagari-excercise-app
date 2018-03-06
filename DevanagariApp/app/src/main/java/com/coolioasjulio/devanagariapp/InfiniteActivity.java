@@ -17,6 +17,8 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 
 import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class InfiniteActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
     private static String TAG = "InfiniteActivity";
@@ -28,6 +30,7 @@ public class InfiniteActivity extends AppCompatActivity implements View.OnClickL
     private ProgressBar progressBar;
     private MediaPlayer mediaPlayer;
     private Context context;
+    private Timer timer;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -102,7 +105,7 @@ public class InfiniteActivity extends AppCompatActivity implements View.OnClickL
                                     getResources().getString(R.string.result_popup_incorrect),
                                     correctLetter);
                         }
-                        notifyUser(message);
+                        notifyUser(message, correct);
                     }
                 };
                 recognizer.getPrediction(bitmap, callback);
@@ -145,6 +148,17 @@ public class InfiniteActivity extends AppCompatActivity implements View.OnClickL
         playPrompt();
     }
 
+    private void setTimer(int timeout, final Runnable onTimer){
+        if(timer != null) timer.cancel();
+        timer = new Timer(true);
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                onTimer.run();
+            }
+        }, timeout * 1000); // Convert seconds to milliseconds
+    }
+
     private void disableUI(){
         progressBar.setVisibility(View.VISIBLE);
         clearButton.setEnabled(false);
@@ -161,7 +175,7 @@ public class InfiniteActivity extends AppCompatActivity implements View.OnClickL
         drawingView.clear();
     }
 
-    private void notifyUser(String message){
+    private void notifyUser(String message, boolean correct){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setCancelable(true); // Cancelable if correct, explicit button press if incorrect
         builder.setTitle(getResources().getString(R.string.result_popup_title));
@@ -173,7 +187,7 @@ public class InfiniteActivity extends AppCompatActivity implements View.OnClickL
                 dialogInterface.dismiss();
             }
         });
-        AlertDialog dialog = builder.create();
+        final AlertDialog dialog = builder.create();
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialogInterface) {
@@ -182,6 +196,20 @@ public class InfiniteActivity extends AppCompatActivity implements View.OnClickL
             }
         });
         dialog.show();
+
+        if(correct) {
+            setTimer(Values.CORRECT_PROMPT_TIMEOUT, new Runnable() {
+                @Override
+                public void run() {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            dialog.dismiss();
+                        }
+                    });
+                }
+            });
+        }
     }
 
     @Override
