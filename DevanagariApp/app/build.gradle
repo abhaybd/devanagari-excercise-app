@@ -28,10 +28,9 @@ android {
         exclude 'META-INF/NOTICE.txt'
         exclude 'META-INF/notice.txt'
         exclude 'META-INF/INDEX.LIST'
-        exclude 'org/bytedeco/javacpp/windows-x86/msvcp120.dll'
-        exclude 'org/bytedeco/javacpp/windows-x86_64/msvcp120.dll'
-        exclude 'org/bytedeco/javacpp/windows-x86/msvcr120.dll'
-        exclude 'org/bytedeco/javacpp/windows-x86_64/msvcr120.dll'
+        exclude 'org/bytedeco/javacpp/windows-x86_64/*'
+        exclude 'org/bytedeco/javacpp/windows-x86/*'
+        exclude 'org/bytedeco/javacpp/macosx-x86_64/*'
     }
 
     configurations {
