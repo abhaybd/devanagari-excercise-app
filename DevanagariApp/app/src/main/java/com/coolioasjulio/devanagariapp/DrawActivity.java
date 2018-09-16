@@ -103,6 +103,7 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
                 playPromptAndStartTimer();
                 break;
             case R.id.next_button:
+                cancelAllTimers();
                 releaseMediaPlayer();
                 disableUI();
                 Bitmap bitmap = drawingView.getBitmap();
@@ -184,6 +185,7 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void releaseMediaPlayer(){
+        if(mediaPlayer == null) return;
         if(mediaPlayer.isPlaying()) mediaPlayer.stop();
         mediaPlayer.release();
         mediaPlayer = null;
