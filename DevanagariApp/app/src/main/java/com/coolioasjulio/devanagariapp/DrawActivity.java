@@ -15,6 +15,8 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -22,7 +24,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.coolioasjulio.devanagariapp.ImageUtils.PredictImageTask.PredictionCallback;
 
-public class DrawActivity extends AppCompatActivity implements View.OnClickListener{
+public class DrawActivity extends AppCompatActivity implements View.OnClickListener {
     private static final String TAG = "DrawActivity";
 
     private int toGuess;
@@ -35,7 +37,7 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
     private Button clearButton, nextButton, playSoundButton;
     private ProgressBar progressBar;
     private MediaPlayer mediaPlayer;
-    private Timer timer;
+    private List<Timer> timers;
     private Context context;
     private TextView correctLabel, incorrectLabel;
     @Override
@@ -51,6 +53,7 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
         sessionGenerator = new SessionGenerator(Values.NUM_CHARS, sessionLength);
 
         this.context = this;
+        timers = new ArrayList<>();
 
         correctLabel = findViewById(R.id.correct_label);
         incorrectLabel = findViewById(R.id.incorrect_label);
@@ -97,7 +100,7 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
                 nextButton.setEnabled(false);
                 break;
             case R.id.play_sound_button:
-                playPrompt();
+                playPromptAndStartTimer();
                 break;
             case R.id.next_button:
                 releaseMediaPlayer();
@@ -125,6 +128,33 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
             default:
                 break;
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(true);
+        builder.setMessage(getString(R.string.quit_to_menu_confirm));
+
+        builder.setPositiveButton(getString(R.string.confirm), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                cancelAllTimers();
+                dialogInterface.dismiss();
+                Intent intent = new Intent(DrawActivity.this, MainActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        builder.setNegativeButton(getString(R.string.cancel),new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     private void updateScore(){
@@ -159,41 +189,56 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
         mediaPlayer = null;
     }
 
-    private void playPrompt(){
+    /**
+     * Play the sound prompt, and then start the countdown timer.
+     */
+    private void playPromptAndStartTimer(){
         mediaPlayer = getMediaPlayer(toGuess);
         if(!mediaPlayer.isPlaying()) {
             mediaPlayer.start();
             mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mediaPlayer) {
-                    setTimer(timeout, new Runnable() {
-                        @Override
-                        public void run() {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    releaseMediaPlayer();
-                                    String msg = getResources().getString(R.string.result_popup_timeout);
-                                    msg = String.format("%s %s", msg, Values.toLetter(context,toGuess));
-                                    notifyUser(msg,false);
-                                }
-                            });
-                        }
-                    });
+                    startTimeoutTimer();
                 }
             });
         }
     }
 
+    private void startTimeoutTimer() {
+        setTimer(timeout, new Runnable() {
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        releaseMediaPlayer();
+                        String msg = getResources().getString(R.string.result_popup_timeout);
+                        msg = String.format("%s %s", msg, Values.toLetter(context,toGuess));
+                        notifyUser(msg,false);
+                    }
+                });
+            }
+        });
+    }
+
+    private void cancelAllTimers() {
+        for(Timer t : timers) {
+            t.cancel();
+        }
+
+        timers.clear();
+    }
+
     private void setTimer(int timeout, final Runnable onTimer){
-        if(timer != null) timer.cancel();
-        timer = new Timer(true);
+        Timer timer = new Timer(true);
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 onTimer.run();
             }
         }, timeout * 1000); // Convert seconds to milliseconds
+        timers.add(timer);
     }
 
     private void nextQuestion(boolean lastCorrect){
@@ -202,13 +247,13 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
         if(elapsedQuestions < sessionLength){
             toGuess = sessionGenerator.next(lastCorrect);
             Log.d(TAG, String.format(Values.LOCALE, "New toGuess: %d", toGuess));
-            playPrompt();
+            playPromptAndStartTimer();
         } else {
             double accuracy = (double)numCorrect/(double)sessionLength;
             Log.d(TAG,String.format("Session finished with accuracy: %.2f", accuracy));
             nextButton.setEnabled(false);
             clearButton.setEnabled(false);
-            timer.cancel();
+            cancelAllTimers();
             startReviewActivity();
         }
     }
@@ -247,7 +292,7 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
                 }
             });
         }
-        builder.setPositiveButton(getResources().getString(R.string.result_popup_ok), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(getResources().getString(R.string.confirm), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 dialogInterface.dismiss();

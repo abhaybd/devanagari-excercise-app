@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -17,13 +19,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, View.OnClickListener{
+public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, View.OnClickListener, TextWatcher{
     private static final String TAG = "MainActivity";
 
     private String currentSelection;
     private List<String> options;
     private int[] intOptions;
     private EditText timeoutInput;
+    private Button startButton;
+    private Button infiniteButton;
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -35,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         // Set the timeout to the default timeout
         String defaultTimeout = String.valueOf(getResources().getInteger(R.integer.default_timeout));
         timeoutInput.setText(defaultTimeout);
+        timeoutInput.addTextChangedListener(this);
 
         intOptions = getResources().getIntArray(R.array.session_length);
         options = new ArrayList<>();
@@ -53,10 +58,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         spinner.setOnItemSelectedListener(this);
 
-        Button startButton = findViewById(R.id.start_button);
+        startButton = findViewById(R.id.start_button);
         startButton.setOnClickListener(this);
 
-        Button infiniteButton = findViewById(R.id.infinite_button);
+        infiniteButton = findViewById(R.id.infinite_button);
         infiniteButton.setOnClickListener(this);
     }
 
@@ -92,5 +97,22 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             default:
                 break;
         }
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+    }
+
+    @Override
+    public void afterTextChanged(Editable editable) {
+        boolean enabled = editable.length() != 0;
+        startButton.setEnabled(enabled);
+        infiniteButton.setEnabled(enabled);
     }
 }

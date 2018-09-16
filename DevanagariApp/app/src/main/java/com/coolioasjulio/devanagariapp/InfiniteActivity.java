@@ -181,7 +181,7 @@ public class InfiniteActivity extends AppCompatActivity implements View.OnClickL
         builder.setTitle(getResources().getString(R.string.result_popup_title));
         builder.setMessage(message);
 
-        builder.setPositiveButton(getResources().getString(R.string.result_popup_ok), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(getResources().getString(R.string.confirm), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 dialogInterface.dismiss();
