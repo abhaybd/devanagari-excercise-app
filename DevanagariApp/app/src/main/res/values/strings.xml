@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Devanagari</string>
-    <string name="app_version">0.1.2</string>
     <string name="app_copyright">Abhay Deshpande © 2018</string>
 
     <string name="main_activity_title">Devanagari</string>

@@ -1,21 +1,29 @@
 apply plugin: "com.android.application"
 
+def versionMajor = 0
+def versionMinor = 1
+def versionPatch = 4
+
 android {
     compileSdkVersion 27
     defaultConfig {
         applicationId "com.coolioasjulio.devanagariapp"
         minSdkVersion 15
         targetSdkVersion 27
-        versionCode 2
-        versionName "1.0"
+        versionCode versionMajor * 10000 + versionMinor * 100 + versionPatch
+        versionName "${versionMajor}.${versionMinor}.${versionPatch}"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
     buildTypes {
+        debug {
+            resValue "string", "app_version", "${defaultConfig.versionName}.dbg"
+        }
         release {
             minifyEnabled false
             useProguard false
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            resValue "string", "app_version", "${defaultConfig.versionName}"
         }
     }
     packagingOptions {
@@ -31,6 +39,9 @@ android {
         exclude 'org/bytedeco/javacpp/windows-x86_64/*'
         exclude 'org/bytedeco/javacpp/windows-x86/*'
         exclude 'org/bytedeco/javacpp/macosx-x86_64/*'
+        exclude 'org/bytedeco/javacpp/linux-ppc64le/*'
+        exclude 'org/bytedeco/javacpp/linux-x86_64/*'
+        exclude 'org/bytedeco/javacpp/linux-x86/*'
     }
 
     configurations {
@@ -47,8 +58,6 @@ android {
 ext {
     dl4jVersion = "0.9.1"
 }
-
-
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
